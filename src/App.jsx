@@ -1,83 +1,111 @@
-import './App.css';
-import {useState} from "react";
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import {v4} from 'uuid';
-import TaskStatus from './components/TaskStatus';
+import "./App.css";
+import { useEffect, useState } from "react";
+import { DragDropContext } from "react-beautiful-dnd";
+import { v4 } from "uuid";
+import TaskStatus from "./components/TaskStatus";
 
-// const uid = v4()
-// console.log(uid)
-const item1 = {
-  id:v4(),
-  name:"Clean the house"
-}
-const item2 = {
-  id:v4(),
-  name:"wash  car"
-}
 function App() {
-  const [state,setState]= useState({
-    "added":{
-      title:"Added",
-      items:[item1]
+  const [text, setText] = useState();
+  const [state, setState] = useState({
+    added: {
+      title: "Added",
+      items: [],
     },
-    "started":{
-      title:"Started",
-      items:[item2]
+    started: {
+      title: "Started",
+      items: [],
     },
-    "completed":{
-      title:"Completed",
-      items:[]
+    completed: {
+      title: "Completed",
+      items: [],
+    },
+  });
+
+  // Load tasks from local storage on component mount
+  useEffect(() => {
+    const storedTasks = localStorage.getItem("tasks");
+    if (storedTasks) {
+      setState((prevState) => ({
+        ...prevState,
+        ...JSON.parse(storedTasks),
+      }));
     }
-  })
+  }, []);
+
+  // Save tasks to local storage on state change
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(state));
+  }, [state]);
+
+  const handleDragEnd = ({ destination, source }) => {
+    if (!destination) {
+      console.log("not dropped in droppable");
+      return;
+    }
+    if (
+      destination.index === source.index &&
+      destination.droppableId === source.droppableId
+    ) {
+      console.log("dropped in same place");
+      return;
+    }
+
+    // Creating a copy of the item before removing it from state
+    const itemCopy = { ...state[source.droppableId].items[source.index] };
+    setState((prev) => {
+      prev = { ...prev };
+      // Remove from previous items array
+      prev[source.droppableId].items.splice(source.index, 1);
+
+      // Adding to new items array location
+      prev[destination.droppableId].items.splice(
+        destination.index,
+        0,
+        itemCopy
+      );
+      localStorage.setItem("tasks", JSON.stringify(state));
+      return prev;
+    });
+  };
+  const addItem = () => {
+    setState((prev) => {
+      return {
+        ...prev,
+        added: {
+          title: "Added",
+          items: [
+            {
+              id: v4(),
+              name: text,
+            },
+            ...prev.added.items,
+          ],
+        },
+      };
+    });
+    localStorage.setItem("tasks", JSON.stringify(state));
+    setText("");
+  };
 
   return (
     <div className="App">
-     <DragDropContext onDragEnd={e => console.log(e)}>
-      {
-        Object.keys(state).map(key => {
-          return <TaskStatus state={state} property={key} />
-        })
-      }
-     </DragDropContext>
+      <div className="form">
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button onClick={addItem}>Add</button>
+      </div>
+      <div className="draggable">
+        <DragDropContext onDragEnd={handleDragEnd}>
+          {Object.keys(state).map((key) => {
+            return <TaskStatus state={state} property={key} key={key} />;
+          })}
+        </DragDropContext>
+      </div>
     </div>
   );
 }
 
 export default App;
-
-
-// Object.keys(state).map(keys => <div keys={keys}>{keys}</div>)
-
-
-{/* <div key={key} className={"column"}>
-              <h3>{state[key].title}</h3>
-              <Droppable droppableId={key}>
-              {(provided)=>{
-                return(
-                  <div 
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className={"droppable-col"}
-                  >
-                   {state[key].items.map((el, index) => {
-                    return(
-                      <Draggable key={el.id} index={index} draggableId={el.id}>
-                        {(provided)=>{
-                          return(
-                            <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                >
-                                  {el.name}
-                            </div>
-                          )
-                        }}
-                      </Draggable>
-                    )
-                   })} 
-                  </div>
-                )
-              }}
-            </Droppable>
-            </div> */}

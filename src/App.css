@@ -1,11 +1,19 @@
 .App{
   display: flex;
   width: 100%;
+  flex-direction: column;
+  
+}
+.App .form{
+  align-self: center;
+}
+.App .draggable{
+  display: flex;
   justify-content: space-around;
 }
-
 .App .column {
-  width: 30%;
+  width: 25%;
+  margin-left: 2%;
 }
 .droppable-col {
   width:100%;
@@ -18,6 +26,7 @@
 
 .item{
     margin-bottom: 10px;
+    background-color: grey;
     color:white;
     border: 1px solid white;
     padding: 5px;

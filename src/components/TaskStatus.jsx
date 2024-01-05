@@ -15,7 +15,7 @@ function TaskStatus({state , property}) {
                   className={"droppable-col"}
                   >
                    {state[property].items.map((el, index) => {
-                    return <TaskItems element={el} indexNum = {index} />
+                    return <TaskItems key={el.id} element={el} indexNum = {index} />
                    })} 
                    {provided.placeholder}
                   </div>
