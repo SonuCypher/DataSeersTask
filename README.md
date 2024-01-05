@@ -13,4 +13,4 @@ Install dependancies and run the project
 ```
     
 
- 
+![Alt text](public/Screenshot%20(277).png)
