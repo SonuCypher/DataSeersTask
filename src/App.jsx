@@ -37,6 +37,7 @@ function App() {
     localStorage.setItem("tasks", JSON.stringify(state));
   }, [state]);
 
+  // Handle for Dragend events
   const handleDragEnd = ({ destination, source }) => {
     if (!destination) {
       console.log("not dropped in droppable");
@@ -67,8 +68,9 @@ function App() {
       return prev;
     });
   };
+  // HANDLE for adding items
   const addItem = () => {
-    setState((prev) => {
+    text && setState((prev) => {
       return {
         ...prev,
         added: {
@@ -87,15 +89,29 @@ function App() {
     setText("");
   };
 
+  const clearItems = () => {
+    setState((prev) => {
+      return {
+        ...prev,
+        completed: {
+          title: "Completed",
+          items: [],
+        },
+      };
+    });
+    localStorage.removeItem("tasks");
+  }
+
   return (
     <div className="App">
       <div className="form">
-        <input
+        <input className="inputText"
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        <button onClick={addItem}>Add</button>
+        <button className="inputButton" onClick={addItem}>Add</button>
+        <button className="inputButton" onClick={clearItems}>clear</button>
       </div>
       <div className="draggable">
         <DragDropContext onDragEnd={handleDragEnd}>
