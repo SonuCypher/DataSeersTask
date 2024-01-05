@@ -113,10 +113,11 @@ function App() {
         <button className="inputButton" onClick={addItem}>Add</button>
         <button className="inputButton" onClick={clearItems}>clear</button>
       </div>
+
       <div className="draggable">
         <DragDropContext onDragEnd={handleDragEnd}>
           {Object.keys(state).map((key) => {
-            return <TaskStatus state={state} property={key} key={key} />;
+            return <TaskStatus setText={setText} state={state} property={key} key={key} />;
           })}
         </DragDropContext>
       </div>
